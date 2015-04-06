@@ -32,5 +32,5 @@ def reducer(key, list_of_values):
 # =============================
 if __name__ == '__main__':
     print os.getcwd()
-    inputdata = open(sys.argv[1])
+    inputdata = open("./data/books.json")
     mr.execute(inputdata, mapper, reducer)
