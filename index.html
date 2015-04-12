@@ -32,14 +32,13 @@
 <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Algorithms in MapReduce: Instructions</h3>
 
 
-<p class="c2"><span>In this assignment, you will be designing and implementing MapReduce algorithms for a variety of common data processing tasks. &nbsp;</span></p><p class="c1"><span></span></p>
+<p class="c2"><span>This page is based on https://class.coursera.org/datasci-002/assignment/view?assignment_id=5 and http://lintool.github.io/Cloud9/ &nbsp;</span></p><p class="c1"><span></span></p>
+
+<p class="c2"><span> In this assignment, you will be designing and implementing MapReduce algorithms for a variety of common data processing tasks. &nbsp;</span></p><p class="c1"><span></span></p>
 
 
-<p class="c2">The MapReduce programming model (and a corresponding system) was proposed in a 2004 paper from a team at Google as a simpler abstraction for processing very large datasets in parallel. &nbsp;The goal of this assignment is to give you experience &ldquo;thinking in MapReduce.&rdquo; &nbsp;We will be using small datasets that you can inspect directly to determine the correctness of your results and to internalize how MapReduce works. &nbsp;In the next assignment, you will have the opportunity to use a MapReduce-based system to process the very large datasets for which it was designed.</p>
 
-<p class="c2">As always, the first thing to do is to update your provided course materials using <code>git pull</code>. These resources may have changed since the last time you interacted with the datasci_course_materials repository.<span class="c5">(Review the <a href="https://class.coursera.org/datasci-001/wiki/view?page=GithubInstructions">Github Instructions</a> if necessary).</p><p class="c2"><span>Next, review the lectures to make sure you understand the programming model.</p>
-
-<h1 class="c2">Python MapReduce Framework</h1>
+<h1 class="c2">Part 1. Python MapReduce Framework</h1>
 
 <p class="c2">You will be provided with a python library called MapReduce.py that implements the MapReduce programming model. The framework faithfully implements the MapReduce programming model, but it executes entirely on a single machine -- it does not involve parallel computation. </span></p>
 
@@ -96,7 +95,7 @@ mr.execute(inputdata, mapper, reducer)
 
 <p>Your python submission scripts are required to have a mapper function that accepts at least 1 argument and a reducer function that accepts at least 2 arguments. Your submission is also required to have a global variable named mr which points to a MapReduce object. If you solve the problems by simply replacing the mapper and reducer functions in wordcount.py, then this condition will be satisfied automatically.</p>
 
-<h1 class="c2">Problem 1</span></h1>
+<h1 class="c2">Problem 1. Inverted index</span></h1>
 
 <p class="c2">Create an Inverted index. Given a set of documents, an inverted index is a dictionary where each word is associated with a list of the document identifiers in which that word appears.</p>
 
@@ -108,7 +107,90 @@ mr.execute(inputdata, mapper, reducer)
 
 <p class="c2"><span>The output should be a (word, document ID list) tuple where word is a String and document ID list is a list of Strings.</span></p><p class="c1"><span></span></p><p class="c2"><span>You can test your solution to this problem using books.json:</span></p><p class="c2"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;python inverted_index.py books.json</span></p><p class="c1"><span></span></p><p class="c2"><span>You can verify your solution against inverted_index.json.</span></p>
 
-<h1 class="c2"><a name="h.h9ky98lavkt4"></a><span>Problem 2</span></h1>
+
+<h1 class="c2">Problem 2. Friend count</h1>
+
+<p class="c2"><span>Consider a simple social network dataset consisting of a set of key-value pairs <code>(person, friend)</code> representing a friend relationship between two people. Describe a MapReduce algorithm to count the number of friends for each person.</span></p>
+
+<h2 class="c2"><a name="h.6bmaxr6905fq"></a><span>Map Input</span></h2>
+
+<p class="c2">Each input record is a 2 element list <code>[personA, personB]</code> where personA is a string representing the name of a person and personB is a string representing the name of one of personA's friends. Note that it may or may not be the case that the personA is a friend of personB.</p>
+
+<h2 class="c2"><a name="h.f3410fx887ut"></a><span>Reduce Output</span></h2>
+
+<p class="c2"><span>The output should be a pair <code>(person, friend_count)</code> where person is a string and friend_count is an integer indicating the number of friends associated with person.</span></p>
+
+<p class="c2"><span>You can test your solution to this problem using friends.json:</span></p>
+
+<pre>
+$ python friend_count.py friends.json
+</pre>
+
+<p class="c2"><span>You can verify your solution by comparing your result with the file friend_count.json.</span></p>
+
+<h1 class="c2">Problem 3. Asymmetric friendships</h1>
+
+<p class="c2"><span>The relationship &quot;friend&quot; is often symmetric, meaning that if I am your friend, you are my friend. Implement a MapReduce algorithm to check whether this property holds. Generate a list of all non-symmetric friend relationships.</span></p>
+
+<h2 class="c2"><a name="h.40menlv78i9q"></a><span>Map Input</span></h2>
+
+<p class="c2">Each input record is a 2 element list <code>[personA, personB]</code> where personA is a string representing the name of a person and personB is a string representing the name of one of personA's friends. Note that it may or may not be the case that the personA is a friend of personB.</p>
+
+<h2 class="c2"><a name="h.atam3upnj7wp"></a><span>Reduce Output</span></h2>
+
+<p class="c2"><span>The output should be the full symmetric relation.  For every pair (person, friend), you will emit BOTH (person, friend) AND (friend, person).  However, be aware that (friend, person) may already appear in the dataset, so you may produce duplicates if you are not careful.</p>
+
+<p class="c2"><span>You can test your solution to this problem using friends.json:</span></p>
+
+<pre>
+$ python asymmetric_friendships.py friends.json
+</pre>
+
+<p class="c2"><span>You can verify your solution by comparing your result with the file asymmetric_friendships.json.</span></p>
+
+<h1 class="c2">Problem 4. Unique trims</span></h1>
+
+<p class="c2"><span>Consider a set of key-value pairs where each key is sequence id and each value is a string of nucleotides, e.g., GCTTCCGAAATGCTCGAA....</span></p>
+
+<p class="c2"><span>Write a MapReduce query to remove the last 10 characters from each string of nucleotides, then remove any duplicates generated.</p>
+
+<h2 class="c2">Map Input</h2>
+
+<p class="c2"><span>Each input record is a 2 element list <code>[sequence id, nucleotides]</code> where sequence id is a string representing a unique identifier for the sequence and nucleotides is a string representing a sequence of nucleotides</span></p>
+
+<h2 class="c2">Reduce Output</h2>
+
+<p class="c2"><span>The output from the reduce function should be the unique trimmed nucleotide strings.</span></p>
+
+<p class="c2"><span>You can test your solution to this problem using dna.json:</span></p>
+
+<pre>
+$ python unique_trims.py dna.json
+</pre>
+
+<p class="c2"><span>You can verify your solution by comparing your result with the file unique_trims.json.</span></p>
+
+<h1 class="c2">Problem 5. Matrix multiply</h1>
+
+<p class="c2"><span>Assume you have two matrices A and B in a sparse matrix format, where each record is of the form i, j, value. Design a MapReduce algorithm to compute the matrix multiplication A x B</span></p>
+
+<h2 class="c2"><a name="h.aqh2zputdew"></a><span>Map Input</span></h2>
+
+<p class="c2"><span>The input to the map function will be a row of a matrix represented as a list.  Each list will be of the form <code>[matrix, i, j, value]</code> where matrix is a string and i, j, and value are integers.</span></p>
+
+<p class="c2"><span>The first item, matrix, is a string that identifies which matrix the record originates from. This field has two possible values: &quot;a&quot; indicates that the record is from matrix A and &quot;b&quot; indicates that the record is from matrix B</span></p>
+
+<h2 class="c2">Reduce Output</h2>
+
+<p class="c2"><span>The output from the reduce function will also be a row of the result matrix represented as a tuple.   Each tuple will be of the form (i, j, value) where each element is an integer.</span></p>
+
+<p class="c2"><span>You can test your solution to this problem using matrix.json:</span></p>
+
+<pre>$ python multiply.py matrix.json</pre>
+
+<p class="c2"><span>You can verify your solution by comparing your result with the file multiply.json.</span></p>
+
+<h1 class="c2"><a name="h.h9ky98lavkt4"></a><span> (Optional) Problem 6. Relational join</span></h1>
 
 <p class="c2"><span>Implement a relational join as a MapReduce query</span></p>
 
@@ -155,87 +237,8 @@ $ python join.py records.json
 
 <p class="c2"><span>You can can compare your solution with join.json.</span></p>
 
-<h1 class="c2">Problem 3</h1>
 
-<p class="c2"><span>Consider a simple social network dataset consisting of a set of key-value pairs <code>(person, friend)</code> representing a friend relationship between two people. Describe a MapReduce algorithm to count the number of friends for each person.</span></p>
-
-<h2 class="c2"><a name="h.6bmaxr6905fq"></a><span>Map Input</span></h2>
-
-<p class="c2">Each input record is a 2 element list <code>[personA, personB]</code> where personA is a string representing the name of a person and personB is a string representing the name of one of personA's friends. Note that it may or may not be the case that the personA is a friend of personB.</p>
-
-<h2 class="c2"><a name="h.f3410fx887ut"></a><span>Reduce Output</span></h2>
-
-<p class="c2"><span>The output should be a pair <code>(person, friend_count)</code> where person is a string and friend_count is an integer indicating the number of friends associated with person.</span></p>
-
-<p class="c2"><span>You can test your solution to this problem using friends.json:</span></p>
-
-<pre>
-$ python friend_count.py friends.json
-</pre>
-
-<p class="c2"><span>You can verify your solution by comparing your result with the file friend_count.json.</span></p>
-
-<h1 class="c2">Problem 4</h1>
-
-<p class="c2"><span>The relationship &quot;friend&quot; is often symmetric, meaning that if I am your friend, you are my friend. Implement a MapReduce algorithm to check whether this property holds. Generate a list of all non-symmetric friend relationships.</span></p>
-
-<h2 class="c2"><a name="h.40menlv78i9q"></a><span>Map Input</span></h2>
-
-<p class="c2">Each input record is a 2 element list <code>[personA, personB]</code> where personA is a string representing the name of a person and personB is a string representing the name of one of personA's friends. Note that it may or may not be the case that the personA is a friend of personB.</p>
-
-<h2 class="c2"><a name="h.atam3upnj7wp"></a><span>Reduce Output</span></h2>
-
-<p class="c2"><span>The output should be the full symmetric relation.  For every pair (person, friend), you will emit BOTH (person, friend) AND (friend, person).  However, be aware that (friend, person) may already appear in the dataset, so you may produce duplicates if you are not careful.</p>
-
-<p class="c2"><span>You can test your solution to this problem using friends.json:</span></p>
-
-<pre>
-$ python asymmetric_friendships.py friends.json
-</pre>
-
-<p class="c2"><span>You can verify your solution by comparing your result with the file asymmetric_friendships.json.</span></p>
-
-<h1 class="c2">Problem 5</span></h1>
-
-<p class="c2"><span>Consider a set of key-value pairs where each key is sequence id and each value is a string of nucleotides, e.g., GCTTCCGAAATGCTCGAA....</span></p>
-
-<p class="c2"><span>Write a MapReduce query to remove the last 10 characters from each string of nucleotides, then remove any duplicates generated.</p>
-
-<h2 class="c2">Map Input</h2>
-
-<p class="c2"><span>Each input record is a 2 element list <code>[sequence id, nucleotides]</code> where sequence id is a string representing a unique identifier for the sequence and nucleotides is a string representing a sequence of nucleotides</span></p>
-
-<h2 class="c2">Reduce Output</h2>
-
-<p class="c2"><span>The output from the reduce function should be the unique trimmed nucleotide strings.</span></p>
-
-<p class="c2"><span>You can test your solution to this problem using dna.json:</span></p>
-
-<pre>
-$ python unique_trims.py dna.json
-</pre>
-
-<p class="c2"><span>You can verify your solution by comparing your result with the file unique_trims.json.</span></p>
-
-<h1 class="c2">Problem 6</h1>
-
-<p class="c2"><span>Assume you have two matrices A and B in a sparse matrix format, where each record is of the form i, j, value. Design a MapReduce algorithm to compute the matrix multiplication A x B</span></p>
-
-<h2 class="c2"><a name="h.aqh2zputdew"></a><span>Map Input</span></h2>
-
-<p class="c2"><span>The input to the map function will be a row of a matrix represented as a list.  Each list will be of the form <code>[matrix, i, j, value]</code> where matrix is a string and i, j, and value are integers.</span></p>
-
-<p class="c2"><span>The first item, matrix, is a string that identifies which matrix the record originates from. This field has two possible values: &quot;a&quot; indicates that the record is from matrix A and &quot;b&quot; indicates that the record is from matrix B</span></p>
-
-<h2 class="c2">Reduce Output</h2>
-
-<p class="c2"><span>The output from the reduce function will also be a row of the result matrix represented as a tuple.   Each tuple will be of the form (i, j, value) where each element is an integer.</span></p>
-
-<p class="c2"><span>You can test your solution to this problem using matrix.json:</span></p>
-
-<pre>$ python multiply.py matrix.json</pre>
-
-<p class="c2"><span>You can verify your solution by comparing your result with the file multiply.json.</span></p>
+<h1 class="c2">Part 2. Reviewing Java MapReduce Lab Assignments</h1>
 
 <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
 
@@ -244,27 +247,8 @@ $ git fetch origin
 $ git checkout gh-pages
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a id="rather-drive-stick" class="anchor" href="#rather-drive-stick" aria-hidden="true"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="https://help.github.com/pages">https://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/ilios86">ilios86</a></p>
