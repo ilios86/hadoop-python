@@ -28,8 +28,7 @@ def reducer(key, list_of_values):
       total += v
     mr.emit((key, total))
 
-# Do not modify below this line
-# =============================
+
 if __name__ == '__main__':
     print os.getcwd()
     inputdata = open("./data/books.json")
